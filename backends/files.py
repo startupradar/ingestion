@@ -8,7 +8,10 @@ from datetime import datetime, date
 from pathlib import Path
 
 import pandas as pd
+from startupradar.transformers.export import DomainExport
+from startupradar.transformers.util.api import StartupRadarAPI
 
+import config
 from base import Deal, DealStorage
 
 
@@ -70,7 +73,9 @@ class PandasExportDealStorage(DealStorage):
             error_msg = f"Output file already exists, delete manually if necessary ({file_path=})"
             raise RuntimeError(error_msg)
 
-        df = pd.DataFrame(self.domains_to_store, columns=["domain"])
-        df.to_csv(file_path)
+        api = StartupRadarAPI(config.API_KEY, page_limit=5000)
+        exporter = DomainExport(api)
+        df = exporter.create_for_domains(self.domains_to_store)
+        df.to_csv(file_path, index_label="domain")
 
         self.domains_to_store = []

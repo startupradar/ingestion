@@ -1,3 +1,6 @@
 # io
 .in/
 .out/
+
+# cache of api
+.cachecontrol
