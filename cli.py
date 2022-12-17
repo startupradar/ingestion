@@ -9,6 +9,9 @@ import pandas as pd
 import requests
 
 
+API_KEY = os.environ["STARTUPRADAR_API_KEY"]
+
+
 class Deal(ABC):
     """
     Representation of a deal, e.g. in a CRM.
@@ -119,14 +122,14 @@ DISCOVERY_ENDPOINTS = [
 ]
 
 
-class DiscoveryEndpoint(DomainSource):
+class DiscoveryEndpointSource(DomainSource):
     def __init__(self, endpoint: str):
         if endpoint not in DISCOVERY_ENDPOINTS:
             error_msg = f"unknown endpoint ({endpoint=}, {DISCOVERY_ENDPOINTS=})"
             raise RuntimeError(error_msg)
 
         self.url = f"https://api.startupradar.co/discovery/{endpoint}"
-        self.api_key = os.environ["STARTUPRADAR_API_KEY"]
+        self.api_key = API_KEY
 
     def generate_domains(self) -> typing.Generator:
         resp = requests.get(self.url, headers={"X-ApiKey": self.api_key})
@@ -137,12 +140,36 @@ class DiscoveryEndpoint(DomainSource):
         return f"<DiscoveryEndpoint {self.url=}>"
 
 
+class SimilarStartupsSource(DomainSource):
+    """
+    Finds similar startups based on a list of existing startups.
+    """
+
+    def __init__(self, domains: typing.List[str]):
+        self.domains = set(domains)
+        self.api_key = API_KEY
+
+    def generate_domains(self) -> typing.Generator:
+        for domain in self.domains:
+            url = f"https://api.startupradar.co/web/domains/{domain}/similar"
+            resp = requests.get(url, headers={"X-ApiKey": self.api_key})
+            assert resp.status_code == 200
+            for d_obj in resp.json():
+                yield d_obj["domain"]
+
+
 def cli():
     # define where deals are stored
     deal_storage = PandasExportDealStorage(".out/")
 
     # define where new deals are discovered
-    sources = [DiscoveryEndpoint(de) for de in DISCOVERY_ENDPOINTS]
+    discovery_sources = [DiscoveryEndpointSource(de) for de in DISCOVERY_ENDPOINTS]
+    sources: typing.List[DomainSource] = discovery_sources
+
+    similar_domains_file_path = Path(".in/similar.txt")
+    if similar_domains_file_path.exists():
+        domains_related = similar_domains_file_path.read_text().split("\n")
+        sources.append(SimilarStartupsSource(domains_related))
 
     # fetch new domains from sources
     domains_fetched = set()
