@@ -2,14 +2,14 @@
 
 # Ingestion framework for StartupRadar
 
-This repository gives you a framework for ingesting StartupRadar data into your own systems.
-Adapting it to your use case should take less than an hour.
+This repository provides a framework to ingest [StartupRadar](https://startupradar.co) data into your own systems.
+Adaption to most use cases should be possible with only a few lines of code.
 
-What it does:
+What Ingestion does for you:
 
-- fetches new startups from StartupRadar through a variety of methods
+- fetches new startups from our [startup API](https://api.startupradar.co/api) through a variety of methods
 - compares all startups against already stored startups
-- crate new deals or updates existing ones
+- creates new deals or updates existing ones
 
 With this tool, you can easily implement the following use cases:
  
