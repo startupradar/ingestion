@@ -1,6 +1,6 @@
 from abc import ABC
 
-from api import DiscoveryEndpointSource, SimilarStartupsSource
+from core.api import DiscoveryEndpointSource, SimilarStartupsSource
 from backends.files import PandasExportDealStorage
 
 

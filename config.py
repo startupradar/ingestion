@@ -1,7 +1,7 @@
 import os
 
-from api import DISCOVERY_ENDPOINTS
-from workflow import CSVWorkflow
+from core.api import DISCOVERY_ENDPOINTS
+from core.workflow import CSVWorkflow
 
 API_KEY = os.environ["STARTUPRADAR_API_KEY"]
 
