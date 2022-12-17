@@ -1,18 +1,28 @@
 # StartupRadar Use Case: Ingestion
 
-This use case gives you a framework on how to ingest StartupRadar data into your own systems.
+This repository gives you a framework for ingesting StartupRadar data into your own systems.
+Adapting it to your use case should take less than an hour.
 
-- fetch data from a variety of sources
-- compare against already stored data
-- crate new deals or update existing ones
+What it does:
+
+- fetches new startups from StartupRadar through a variety of methods
+- compares all startups against already stored startups
+- crate new deals or updates existing ones
+
+With this tool, you can easily implement the following use cases:
+ 
+- create a new CRM deal for every unseen startup on StartupRadar
+- create a new comment for every competitor to a portfolio startup
+- add a comment on every deal that gets mentioned in the news
 
 
 ## Supported Backends
 Backends are the places where existing deals can be found and where new deals can get stored.
+So if a new startup pops up, this is where it's stored.
 
 File-based:
 
-- CSV
+- CSV: a CSV file with a row for each startup
 
 CRMs (coming soon):
 
@@ -22,20 +32,32 @@ CRMs (coming soon):
 - Salesforce
 - Attio
 
-Other (coming soon):
+Others (coming soon):
 
-- Airtable
-- Slack
-- Asana
-- Trello
+- Airtable: check against and push new rows to airtable
+- Slack: push new startups as slack messages
+- Asana: add a task for each new startup
+- Trello: add a card for each new startup
+
+Implementing your own storage backend is possible as well.
 
 
-## How to use
+## How new startups can be discovered
+This tool provides easy access to the API and its features.
+New startups can currently be discovered in two ways.
+Firstly, via the Discovery endpoints of the API.
+These endpoints provide daily fresh discoveries, e.g. startups from academia or startups in the press.
+Secondly, by checking similar startups for a given list of startups, 
+e.g. going through all your existing deals and adding newly discovered, related startups,
+or by going through your portfolio and adding similar startups.
+
+
+## Installation and usage
 - install by cloning this repository
 - create a virtual environment and activate it
 - install its requirements: `pip install -r requirements.txt`
+- set the API key as the `STARTUPRADAR_API_KEY` environment variable
 - configure your storage
-- set your API key
 
 
 ## Changelog
