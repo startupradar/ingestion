@@ -1,4 +1,6 @@
-# StartupRadar Use Case: Ingestion
+![An overview of StartupRadar's ingestion framework](.github/image.png)
+
+# Ingestion framework for StartupRadar
 
 This repository gives you a framework for ingesting StartupRadar data into your own systems.
 Adapting it to your use case should take less than an hour.
@@ -56,8 +58,7 @@ or by going through your portfolio and adding similar startups.
 - install by cloning this repository
 - create a virtual environment and activate it
 - install its requirements: `pip install -r requirements.txt`
-- set the API key as the `STARTUPRADAR_API_KEY` environment variable
-- configure your storage
+- edit the config.py file to match your desired workflow
 
 
 ## Changelog
