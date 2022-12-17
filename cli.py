@@ -14,18 +14,24 @@ class Deal(ABC):
     Representation of a deal, e.g. in a CRM.
     """
 
-    def get_created_at(self) -> datetime.date:
-        """
-        The date this deal was created.
-        :return: creation date
-        """
+    created_at: datetime.date = None
+    last_activity: datetime.date = None
+
+    def add_note(self, note: str):
         raise NotImplementedError()
 
-    def get_last_activity(self) -> datetime.date:
-        raise NotImplementedError()
 
-    def add_note(self):
-        raise NotImplementedError()
+class PandasDeal(Deal):
+    def __init__(self, file_date: datetime.date):
+        # for pandas frame, we only know the creation date
+        self.created_at = file_date
+        self.last_activity = file_date
+
+    def add_note(self, note: str):
+        raise RuntimeError("For file-based deals, creating notes is not possible")
+
+    def __repr__(self):
+        return f"<PandasDeal {self.created_at=}>"
 
 
 class DealStorage(ABC):
@@ -41,12 +47,16 @@ class DealStorage(ABC):
 
     def sync(self) -> None:
         """
-        Run a sync, i.e. push and update deals.
+        Run a sync, i.e. push new deals and notes.
         """
         raise NotImplementedError()
 
 
 class PandasExportDealStorage(DealStorage):
+    """
+    This is a pandas-based CSV export of deals.
+    """
+
     def __init__(self, directory):
         self.directory = Path(directory)
 
@@ -66,9 +76,14 @@ class PandasExportDealStorage(DealStorage):
         ]
 
     def find_deals_by_domain(self, domain: str) -> typing.List[Deal]:
+        deals = []
         for filename, df in zip(self.get_filenames(), self.get_dataframes()):
             if domain in df["domain"].values:
-                return [Deal()]
+                file_path = self.directory.joinpath(filename)
+                timestamp_creation = file_path.lstat().st_ctime
+                created_at = datetime.datetime.fromtimestamp(timestamp_creation).date()
+                deals.append(PandasDeal(created_at))
+        return deals
 
     def add_deal(self, title, domain):
         self.domains_to_store.append(domain)
@@ -79,7 +94,8 @@ class PandasExportDealStorage(DealStorage):
 
         # abort if file exists
         if file_path.exists():
-            raise RuntimeError(f'Output file already exists, delete manually if necessary ({file_path=})')
+            error_msg = f"Output file already exists, delete manually if necessary ({file_path=})"
+            raise RuntimeError(error_msg)
 
         df = pd.DataFrame(self.domains_to_store, columns=["domain"])
         df.to_csv(file_path)
@@ -140,7 +156,9 @@ def cli():
     for domain in domains_fetched:
         deals_with_domain = deal_storage.find_deals_by_domain(domain)
         if deals_with_domain:
-            logging.info(f"deal for domain already exists ({domain=})")
+            logging.info(
+                f"deal for domain already exists ({domain=}, {deals_with_domain=})"
+            )
         else:
             logging.info(f"deal is new ({domain=})")
             domains_to_push.append(domain)
