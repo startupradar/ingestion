@@ -31,11 +31,3 @@ class DealStorage(ABC):
         Run a sync, i.e. push new deals and notes.
         """
         raise NotImplementedError()
-
-
-class DomainSource(ABC):
-    def generate_domains(self) -> typing.Generator:
-        raise NotImplementedError()
-
-    def get_domains(self) -> typing.List[str]:
-        return list(self.generate_domains())

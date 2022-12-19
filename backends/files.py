@@ -12,7 +12,7 @@ from startupradar.transformers.export import DomainExport
 from startupradar.transformers.util.api import StartupRadarAPI
 
 import config
-from core.base import Deal, DealStorage
+from core.deals import Deal, DealStorage
 
 
 class PandasDeal(Deal):

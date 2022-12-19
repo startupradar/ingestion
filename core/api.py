@@ -1,9 +1,9 @@
 import typing
+from abc import ABC
 
 import requests
 
 import config
-from base import DomainSource
 
 DISCOVERY_ENDPOINTS = [
     "in-the-press",
@@ -17,6 +17,14 @@ def _request(url):
     resp = requests.get(url, headers={"X-ApiKey": config.API_KEY})
     assert resp.status_code == 200, f"failed ({resp.status_code=}, {resp.json()})"
     return resp.json()
+
+
+class DomainSource(ABC):
+    def generate_domains(self) -> typing.Generator:
+        raise NotImplementedError()
+
+    def get_domains(self) -> typing.List[str]:
+        return list(self.generate_domains())
 
 
 class DiscoveryEndpointSource(DomainSource):

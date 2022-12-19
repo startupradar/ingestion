@@ -1,7 +1,7 @@
 import logging
 
 import config
-from workflow import Workflow
+from core.workflow import Workflow
 
 
 def get_workflow() -> Workflow:
