@@ -61,6 +61,36 @@ or by going through your portfolio and adding similar startups.
 - edit the config.py file to match your desired workflow
 
 
+## Workflow examples
+The example below shows you how to set up your worflow inside `config.py`.
+
+```python
+import os
+
+from core.api import DISCOVERY_ENDPOINTS, DiscoveryEndpointSource, SimilarStartupsSource
+from core.workflow import CSVWorkflow
+
+API_KEY = os.environ['STARTUPRADAR_API_KEY']
+
+#
+# set up default workflow
+#
+
+# find startups with the discovery endpoints
+# and by checking the related domains of startupradar.co
+sources = [
+    # use all discovery endpoints
+    *[DiscoveryEndpointSource(de) for de in DISCOVERY_ENDPOINTS],
+    # add list of related domains
+    SimilarStartupsSource(["startupradar.co"]),
+]
+
+# create a workflow which
+# - uses these sources
+# - pushes new results into CSVs inside the out folder
+WORKFLOW = CSVWorkflow(sources, ".out/")
+```
+
 ## Changelog
 
 ### 2022-12-17

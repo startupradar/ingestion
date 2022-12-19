@@ -1,7 +1,8 @@
+import typing
 from abc import ABC
 
-from core.api import DiscoveryEndpointSource, SimilarStartupsSource
 from backends.files import PandasExportDealStorage
+from core.api import DomainSource
 
 
 class Workflow(ABC):
@@ -10,14 +11,9 @@ class Workflow(ABC):
 
 
 class CSVWorkflow(Workflow):
-    def __init__(self, endpoints, output_directory=".out/"):
+    def __init__(self, sources: typing.List[DomainSource], output_directory=".out/"):
         # set up sources
-        self.sources = [
-            # use all discovery endpoints
-            *[DiscoveryEndpointSource(de) for de in endpoints],
-            # add list of related domains
-            SimilarStartupsSource(["karllorey.com"]),
-        ]
+        self.sources = sources
 
         # set up storage
         self.storage = PandasExportDealStorage(output_directory)
